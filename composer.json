@@ -1,0 +1,15 @@
+{
+    "name": "darkling/zipator",
+    "description": "Zip files",
+    "authors": [
+        {
+            "name": "Jan Vanura",
+            "email": "jano.vano@gmail.com"
+        }
+    ],
+    "require": {
+        "nette/robot-loader": "^v2.4",
+        "nette/utils": "^v2.4",
+        "symfony/console": "^3.1"
+    }
+}
