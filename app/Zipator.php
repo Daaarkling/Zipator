@@ -3,6 +3,7 @@
 namespace Zipator;
 
 
+use Nette\Utils\Strings;
 use ZipArchive;
 
 class Zipator
@@ -18,39 +19,43 @@ class Zipator
 	 * @param string $fileExtension - archive only files with this extension
 	 * @return int - number of created archives
 	 */
-	public function zip($inputDir, $outputDir = NULL, $maxSize = NULL, $fileExtension = NULL)
+	public function zip($inputDir, $outputDir = null, $maxSize = null, $fileExtension = null)
 	{
 		$size = 0;
 		$count = 1;
-		$atLeastOne = FALSE;
-		$outputDir = $outputDir !== NULL ? $outputDir : $inputDir;
+		$atLeastOne = false;
+		$outputDir = $outputDir !== null ? $outputDir : $inputDir;
+		$names = [];
 
-		$zip = self::createArchive($outputDir, $count);
+		list($zip, $name) = self::createArchive($outputDir, $count);
+		$names[] = $name;
 
 		/** @var \SplFileInfo $fileinfo */
 		foreach (new \FilesystemIterator($inputDir) as $fileinfo) {
 
-			if($fileinfo->isDir() || strcasecmp($fileinfo->getExtension(), 'zip') === 0)
+			if($fileinfo->isDir() || in_array(Strings::lower($fileinfo->getBasename()), $names, true)){
 				continue;
+			}
 
 			if ($fileExtension) {
 				if (strcasecmp($fileinfo->getExtension(), $fileExtension) === 0) {
-					$atLeastOne = TRUE;
+					$atLeastOne = true;
 					$zip->addFile($fileinfo->getPathname(), $fileinfo->getFilename());
 				} else {
 					continue;
 				}
 			} else {
-				$atLeastOne = TRUE;
-				$zip->addFile($fileinfo->getPathname(), $fileinfo->getFilename());
+				$atLeastOne = true;
+				$zip->addFile($fileinfo->getPathname(), $fileinfo->getBasename());
 			}
 			$size += $fileinfo->getSize();
 
-			if ($maxSize !== NULL && $size >= $maxSize) {
+			if ($maxSize !== null && $size >= $maxSize) {
 				$zip->close();
 				$count++;
 				$size = 0;
-				$zip = self::createArchive($outputDir, $count);
+				list($zip, $name) = self::createArchive($outputDir, $count);
+				$names[] = $name;
 			}
 		}
 
@@ -62,17 +67,17 @@ class Zipator
 	/**
 	 * @param string $dir
 	 * @param int $count
-	 * @return ZipArchive
+	 * @return array
 	 */
 	private function createArchive($dir, $count)
 	{
 		$zip = new ZipArchive();
 		$name = $dir . '/' . self::$archiveName . $count . '.zip';
 
-		if ($zip->open($name, ZipArchive::CREATE) !== TRUE) {
+		if ($zip->open($name, ZipArchive::CREATE) !== true) {
 			exit("Cannot open <$name>\n");
 		}
 
-		return $zip;
+		return [$zip, $name];
 	}
 }

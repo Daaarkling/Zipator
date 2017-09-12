@@ -2,11 +2,6 @@
 
 namespace Zipator;
 
-
-use Benchmark\Benchmark;
-use Benchmark\Config;
-use Benchmark\ConsoleOutput;
-use Benchmark\CsvOutput;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,7 +29,7 @@ class RunCommand extends Command
 
 		// input
 		$inputDir = $input->getOption('input');
-		if($inputDir !== NULL) {
+		if($inputDir !== null) {
 			$inputDir = realpath($inputDir);
 		} else {
 			$io->error('Set path to input directory');
@@ -48,7 +43,7 @@ class RunCommand extends Command
 
 		// max size
 		$maxSize = $input->getOption('size');
-		if($maxSize !== NULL) {
+		if($maxSize !== null) {
 			if($maxSize < 1) {
 				$io->error("Max size must be whole number greater than zero.");
 				exit(1);
